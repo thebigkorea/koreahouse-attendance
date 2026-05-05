@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>한국의집 출퇴근</title>
+
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Noto Sans KR";
+  background: #f5f1e8;
+}
+
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+
+button {
+  width: 100%;
+  height: 70px;
+  border: none;
+  border-radius: 18px;
+  font-size: 24px;
+  font-weight: 900;
+  margin-top: 14px;
+
+  transition: all 0.08s ease;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+}
+
+/* ✅ 터치감 */
+button:active {
+  transform: translateY(5px) scale(0.97);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+  opacity: 0.85;
+}
+
+.btn-in { background:#0f8a4b; color:#fff; }
+.btn-out { background:#b3261e; color:#fff; }
+
+.btn-disabled {
+  background:#ccc !important;
+  box-shadow:none !important;
+  opacity:0.6;
+}
+
+.status {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 14px;
+  background:#f3f3f3;
+  text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<div class="card">
+
+<div class="title">출퇴근 체크</div>
+
+<button id="checkInBtn" class="btn-in" onclick="submitAttendance('출근')">출근</button>
+<button id="checkOutBtn" class="btn-out" onclick="submitAttendance('퇴근')">퇴근</button>
+
+<div id="status" class="status">대기중</div>
+
+</div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyw9t73sgrCypnl5o8HjyQ1EQ5kKR2Yq5txCHt3W3xJerbyRLo87TOZcJPLF6r8YIPZ/exec";
+
+function submitAttendance(type) {
+
+  const checkInBtn = document.getElementById("checkInBtn");
+  const checkOutBtn = document.getElementById("checkOutBtn");
+  const status = document.getElementById("status");
+
+  // ✅ 버튼 터치 즉시 반응
+  if(type==="출근"){
+    checkInBtn.innerText="출근 처리중...";
+    checkInBtn.classList.add("btn-disabled");
+  }
+
+  if(type==="퇴근"){
+    checkOutBtn.innerText="퇴근 처리중...";
+    checkOutBtn.classList.add("btn-disabled");
+  }
+
+  status.innerText="위치 확인중...";
+
+  navigator.geolocation.getCurrentPosition(pos => {
+
+    fetch(API_URL,{
+      method:"POST",
+      body:JSON.stringify({
+        action:"submitAttendance",
+        type:type,
+        lat:pos.coords.latitude,
+        lng:pos.coords.longitude
+      })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+
+      status.innerText = res.message;
+
+      // 버튼 복구
+      checkInBtn.innerText="출근";
+      checkOutBtn.innerText="퇴근";
+      checkInBtn.classList.remove("btn-disabled");
+      checkOutBtn.classList.remove("btn-disabled");
+
+    })
+    .catch(()=>{
+      status.innerText="오류 발생";
+
+      checkInBtn.innerText="출근";
+      checkOutBtn.innerText="퇴근";
+      checkInBtn.classList.remove("btn-disabled");
+      checkOutBtn.classList.remove("btn-disabled");
+    });
+
+  }, ()=>{
+    status.innerText="위치 허용 필요";
+  });
+}
+</script>
+
+</body>
+</html>
