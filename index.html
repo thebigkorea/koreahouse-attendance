@@ -1,155 +1,517 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>한국의집 출퇴근</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>한국의집 출퇴근</title>
 
-<style>
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-body {
-  margin: 0;
-  font-family: -apple-system, "Noto Sans KR";
-  background: #f5f1e8;
-}
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background: #f5f1e8;
+      color: #222;
+    }
 
-.wrap {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.card {
-  width: 100%;
-  background: #fff;
-  border-radius: 24px;
-  padding: 28px;
-}
+    .card {
+      width: 100%;
+      background: #fff;
+      border-radius: 24px;
+      padding: 28px 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
 
-.title {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 900;
-  margin-bottom: 20px;
-}
+    .logo {
+      text-align: center;
+      font-size: 34px;
+      font-weight: 900;
+      color: #5b2c16;
+      margin-bottom: 8px;
+    }
 
-button {
-  width: 100%;
-  height: 70px;
-  border: none;
-  border-radius: 18px;
-  font-size: 24px;
-  font-weight: 900;
-  margin-top: 14px;
+    .store {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #777;
+      margin-bottom: 26px;
+    }
 
-  transition: all 0.08s ease;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-}
+    .title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 22px;
+    }
 
-/* ✅ 터치감 */
-button:active {
-  transform: translateY(5px) scale(0.97);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.2);
-  opacity: 0.85;
-}
+    .desc {
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #666;
+      margin-bottom: 24px;
+    }
 
-.btn-in { background:#0f8a4b; color:#fff; }
-.btn-out { background:#b3261e; color:#fff; }
+    label {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
 
-.btn-disabled {
-  background:#ccc !important;
-  box-shadow:none !important;
-  opacity:0.6;
-}
+    input {
+      width: 100%;
+      height: 60px;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      padding: 0 16px;
+      font-size: 21px;
+      margin-bottom: 18px;
+      outline: none;
+    }
 
-.status {
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 14px;
-  background:#f3f3f3;
-  text-align:center;
-}
+    button {
+      width: 100%;
+      height: 72px;
+      border: none;
+      border-radius: 20px;
+      font-size: 25px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
+      box-shadow: 0 7px 0 rgba(0,0,0,0.22);
+    }
 
-</style>
+    button:active {
+      transform: translateY(6px) scale(0.98);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.22);
+      opacity: 0.88;
+    }
+
+    button:disabled {
+      transform: none !important;
+      box-shadow: none !important;
+      opacity: 0.65;
+    }
+
+    .btn-register { background: #5b2c16; color: #fff; }
+    .btn-in { background: #0f8a4b; color: #fff; }
+    .btn-out { background: #b3261e; color: #fff; }
+    .btn-reset { background: #eee; color: #333; font-size: 17px; height: 54px; }
+
+    .btn-disabled {
+      background: #ccc !important;
+      color: #777 !important;
+      cursor: not-allowed;
+    }
+
+    .employee-box {
+      background: #f8f4ed;
+      padding: 22px;
+      border-radius: 18px;
+      margin-bottom: 22px;
+      text-align: center;
+      border: 1px solid #eadfce;
+    }
+
+    .employee-name {
+      font-size: 30px;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .employee-phone {
+      font-size: 22px;
+      font-weight: 800;
+      color: #333;
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #f3f3f3;
+      color: #333;
+      font-size: 17px;
+      line-height: 1.5;
+      text-align: center;
+      min-height: 56px;
+    }
+
+    .hidden { display: none !important; }
+
+    .loading-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #5b2c16;
+      margin: 0 auto 18px;
+      animation: pulse 1s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0.3; transform: scale(0.9); }
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<div class="card">
+  <div class="wrap">
+    <div class="card">
 
-<div class="title">출퇴근 체크</div>
+      <div class="logo">한국의집</div>
+      <div class="store">롯데월드몰 출퇴근 관리</div>
 
-<button id="checkInBtn" class="btn-in" onclick="submitAttendance('출근')">출근</button>
-<button id="checkOutBtn" class="btn-out" onclick="submitAttendance('퇴근')">퇴근</button>
+      <div id="loadingScreen">
+        <div class="loading-dot"></div>
+        <div class="title">출퇴근 앱 실행 중...</div>
+        <div class="desc">직원 정보를 확인하고 있습니다.</div>
+      </div>
 
-<div id="status" class="status">대기중</div>
+      <div id="registerScreen" class="hidden">
+        <div class="title">직원 등록</div>
+        <div class="desc">
+          최초 1회만 등록하면 됩니다.<br>
+          이후에는 자동으로 출퇴근 화면이 열립니다.
+        </div>
 
-</div>
-</div>
+        <label>직원명</label>
+        <input id="nameInput" type="text" placeholder="예: 홍길동">
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyw9t73sgrCypnl5o8HjyQ1EQ5kKR2Yq5txCHt3W3xJerbyRLo87TOZcJPLF6r8YIPZ/exec";
+        <label>전화번호</label>
+        <input id="phoneInput" type="tel" placeholder="예: 01012345678">
 
-function submitAttendance(type) {
+        <button class="btn-register" onclick="registerEmployee()">직원 등록</button>
 
-  const checkInBtn = document.getElementById("checkInBtn");
-  const checkOutBtn = document.getElementById("checkOutBtn");
-  const status = document.getElementById("status");
+        <div id="registerStatus" class="status hidden"></div>
+      </div>
 
-  // ✅ 버튼 터치 즉시 반응
-  if(type==="출근"){
-    checkInBtn.innerText="출근 처리중...";
-    checkInBtn.classList.add("btn-disabled");
-  }
+      <div id="attendanceScreen" class="hidden">
+        <div class="title">출퇴근 체크</div>
 
-  if(type==="퇴근"){
-    checkOutBtn.innerText="퇴근 처리중...";
-    checkOutBtn.classList.add("btn-disabled");
-  }
+        <div class="employee-box">
+          <div id="employeeName" class="employee-name"></div>
+          <div id="employeePhone" class="employee-phone"></div>
+        </div>
 
-  status.innerText="위치 확인중...";
+        <button id="checkInBtn" class="btn-in" onclick="submitAttendance('출근')">출근</button>
+        <button id="checkOutBtn" class="btn-out" onclick="submitAttendance('퇴근')">퇴근</button>
 
-  navigator.geolocation.getCurrentPosition(pos => {
+        <button class="btn-reset" onclick="resetEmployee()">직원 정보 다시 등록</button>
 
-    fetch(API_URL,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"submitAttendance",
-        type:type,
-        lat:pos.coords.latitude,
-        lng:pos.coords.longitude
-      })
-    })
-    .then(res=>res.json())
-    .then(res=>{
+        <div id="attendanceStatus" class="status">
+          위치 권한을 허용해야 출퇴근이 가능합니다.
+        </div>
+      </div>
 
-      status.innerText = res.message;
+    </div>
+  </div>
 
-      // 버튼 복구
-      checkInBtn.innerText="출근";
-      checkOutBtn.innerText="퇴근";
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw9t73sgrCypnl5o8HjyQ1EQ5kKR2Yq5txCHt3W3xJerbyRLo87TOZcJPLF6r8YIPZ/exec";
+
+    let currentEmployee = {
+      name: "",
+      phone: "",
+      token: ""
+    };
+
+    window.onload = function () {
+      showLoadingScreen();
+
+      setTimeout(function () {
+        const savedToken = localStorage.getItem("hk_token");
+
+        if (savedToken) {
+          apiRequest({
+            action: "getEmployeeByToken",
+            token: savedToken
+          }).then(function(result) {
+            if (result.exists) {
+              currentEmployee = {
+                name: result.name,
+                phone: result.phone,
+                token: result.token
+              };
+
+              saveEmployee(currentEmployee);
+              showAttendanceScreen();
+              loadTodayStatus();
+            } else {
+              clearEmployee();
+              showRegisterScreen();
+            }
+          }).catch(function() {
+            showRegisterScreen();
+          });
+        } else {
+          showRegisterScreen();
+        }
+      }, 800);
+    };
+
+    function registerEmployee() {
+      const name = document.getElementById("nameInput").value.trim();
+      const phone = normalizePhone(document.getElementById("phoneInput").value);
+
+      if (!name) {
+        showRegisterStatus("직원명을 입력해주세요.");
+        return;
+      }
+
+      if (!phone) {
+        showRegisterStatus("전화번호를 입력해주세요.");
+        return;
+      }
+
+      showRegisterStatus("등록 중입니다...");
+
+      apiRequest({
+        action: "registerEmployee",
+        name: name,
+        phone: phone
+      }).then(function(result) {
+        if (result.success) {
+          currentEmployee = {
+            name: result.name,
+            phone: result.phone,
+            token: result.token
+          };
+
+          saveEmployee(currentEmployee);
+          showAttendanceScreen();
+          updateButtons(false, false);
+          showAttendanceStatus("등록 완료되었습니다. 출근 버튼을 눌러주세요.");
+        } else {
+          showRegisterStatus(result.message || "등록에 실패했습니다.");
+        }
+      }).catch(function() {
+        showRegisterStatus("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      });
+    }
+
+    function submitAttendance(type) {
+      if (!currentEmployee.name || !currentEmployee.phone || !currentEmployee.token) {
+        showAttendanceStatus("직원 정보가 없습니다. 다시 등록해주세요.");
+        return;
+      }
+
+      const checkInBtn = document.getElementById("checkInBtn");
+      const checkOutBtn = document.getElementById("checkOutBtn");
+
+      if (type === "출근") {
+        checkInBtn.innerText = "출근 처리중...";
+        checkInBtn.disabled = true;
+      }
+
+      if (type === "퇴근") {
+        checkOutBtn.innerText = "퇴근 처리중...";
+        checkOutBtn.disabled = true;
+      }
+
+      showAttendanceStatus("현재 위치를 확인 중입니다...");
+
+      if (!navigator.geolocation) {
+        resetButtonText();
+        showAttendanceStatus("이 기기에서는 위치 기능을 사용할 수 없습니다.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          showAttendanceStatus(type + " 처리 중입니다...");
+
+          apiRequest({
+            action: "submitAttendance",
+            token: currentEmployee.token,
+            name: currentEmployee.name,
+            phone: currentEmployee.phone,
+            type: type,
+            lat: lat,
+            lng: lng
+          }).then(function(result) {
+            resetButtonText();
+            showAttendanceStatus(result.message);
+
+            if (result.success) {
+              if (type === "출근") {
+                updateButtons(true, false);
+              }
+
+              if (type === "퇴근") {
+                updateButtons(true, true);
+              }
+            } else {
+              loadTodayStatus();
+            }
+          }).catch(function() {
+            resetButtonText();
+            showAttendanceStatus("오류가 발생했습니다. 잠시 후 다시 눌러주세요.");
+            loadTodayStatus();
+          });
+        },
+        function() {
+          resetButtonText();
+          showAttendanceStatus("위치 권한을 허용해야 출퇴근이 가능합니다.");
+          loadTodayStatus();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    function resetButtonText() {
+      document.getElementById("checkInBtn").innerText = "출근";
+      document.getElementById("checkOutBtn").innerText = "퇴근";
+    }
+
+    function loadTodayStatus() {
+      apiRequest({
+        action: "getTodayAttendanceStatus",
+        phone: currentEmployee.phone
+      }).then(function(result) {
+        updateButtons(result.hasCheckIn, result.hasCheckOut);
+      }).catch(function() {
+        showAttendanceStatus("출퇴근 상태 확인 중 오류가 발생했습니다.");
+      });
+    }
+
+    function apiRequest(data) {
+      return fetch(API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(data)
+      }).then(function(response) {
+        return response.json();
+      });
+    }
+
+    function updateButtons(hasCheckIn, hasCheckOut) {
+      const checkInBtn = document.getElementById("checkInBtn");
+      const checkOutBtn = document.getElementById("checkOutBtn");
+
+      resetButtonText();
+
+      checkInBtn.disabled = false;
+      checkOutBtn.disabled = false;
+
       checkInBtn.classList.remove("btn-disabled");
       checkOutBtn.classList.remove("btn-disabled");
 
-    })
-    .catch(()=>{
-      status.innerText="오류 발생";
+      if (hasCheckIn) {
+        checkInBtn.disabled = true;
+        checkInBtn.classList.add("btn-disabled");
+      }
 
-      checkInBtn.innerText="출근";
-      checkOutBtn.innerText="퇴근";
-      checkInBtn.classList.remove("btn-disabled");
-      checkOutBtn.classList.remove("btn-disabled");
-    });
+      if (!hasCheckIn || hasCheckOut) {
+        checkOutBtn.disabled = true;
+        checkOutBtn.classList.add("btn-disabled");
+      }
 
-  }, ()=>{
-    status.innerText="위치 허용 필요";
-  });
-}
-</script>
+      if (!hasCheckIn) {
+        showAttendanceStatus("아직 출근 전입니다.");
+      } else if (hasCheckIn && !hasCheckOut) {
+        showAttendanceStatus("출근 처리되었습니다. 퇴근 버튼을 사용할 수 있습니다.");
+      } else {
+        showAttendanceStatus("오늘 출근과 퇴근이 모두 처리되었습니다.");
+      }
+    }
 
+    function saveEmployee(emp) {
+      localStorage.setItem("hk_name", emp.name);
+      localStorage.setItem("hk_phone", emp.phone);
+      localStorage.setItem("hk_token", emp.token);
+    }
+
+    function clearEmployee() {
+      localStorage.removeItem("hk_name");
+      localStorage.removeItem("hk_phone");
+      localStorage.removeItem("hk_token");
+    }
+
+    function resetEmployee() {
+      clearEmployee();
+
+      currentEmployee = {
+        name: "",
+        phone: "",
+        token: ""
+      };
+
+      document.getElementById("nameInput").value = "";
+      document.getElementById("phoneInput").value = "";
+
+      showRegisterScreen();
+    }
+
+    function showLoadingScreen() {
+      document.getElementById("loadingScreen").classList.remove("hidden");
+      document.getElementById("registerScreen").classList.add("hidden");
+      document.getElementById("attendanceScreen").classList.add("hidden");
+    }
+
+    function showRegisterScreen() {
+      document.getElementById("loadingScreen").classList.add("hidden");
+      document.getElementById("registerScreen").classList.remove("hidden");
+      document.getElementById("attendanceScreen").classList.add("hidden");
+    }
+
+    function showAttendanceScreen() {
+      document.getElementById("loadingScreen").classList.add("hidden");
+      document.getElementById("registerScreen").classList.add("hidden");
+      document.getElementById("attendanceScreen").classList.remove("hidden");
+
+      document.getElementById("employeeName").innerText = currentEmployee.name;
+      document.getElementById("employeePhone").innerText = formatPhone(currentEmployee.phone);
+    }
+
+    function showRegisterStatus(message) {
+      const box = document.getElementById("registerStatus");
+      box.classList.remove("hidden");
+      box.innerText = message;
+    }
+
+    function showAttendanceStatus(message) {
+      document.getElementById("attendanceStatus").innerText = message;
+    }
+
+    function normalizePhone(phone) {
+      return String(phone || "").replace(/[^0-9]/g, "");
+    }
+
+    function formatPhone(phone) {
+      phone = normalizePhone(phone);
+
+      if (phone.length === 11) {
+        return phone.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+      }
+
+      return phone;
+    }
+  </script>
 </body>
 </html>
