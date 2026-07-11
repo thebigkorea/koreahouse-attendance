@@ -388,7 +388,7 @@
 
 .employee-summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 22px;
 }
@@ -775,37 +775,47 @@
 
         <div class="employee-summary-grid">
 
-          <div class="employee-summary-card">
-            <div class="employee-summary-label">출근 횟수</div>
-            <div
-              id="detailCheckInCount"
-              class="employee-summary-value"
-            >
-              0
-            </div>
-          </div>
+  <div class="employee-summary-card">
+    <div class="employee-summary-label">출근 횟수</div>
+    <div
+      id="detailCheckInCount"
+      class="employee-summary-value"
+    >
+      0
+    </div>
+  </div>
 
-          <div class="employee-summary-card">
-            <div class="employee-summary-label">퇴근 횟수</div>
-            <div
-              id="detailCheckOutCount"
-              class="employee-summary-value"
-            >
-              0
-            </div>
-          </div>
+  <div class="employee-summary-card">
+    <div class="employee-summary-label">퇴근 횟수</div>
+    <div
+      id="detailCheckOutCount"
+      class="employee-summary-value"
+    >
+      0
+    </div>
+  </div>
 
-          <div class="employee-summary-card">
-            <div class="employee-summary-label">퇴근 미처리</div>
-            <div
-              id="detailMissingCount"
-              class="employee-summary-value"
-            >
-              0
-            </div>
-          </div>
+  <div class="employee-summary-card">
+    <div class="employee-summary-label">평균 근무시간</div>
+    <div
+      id="detailAverageWorkTime"
+      class="employee-summary-value"
+    >
+      -
+    </div>
+  </div>
 
-        </div>
+  <div class="employee-summary-card">
+    <div class="employee-summary-label">퇴근 미처리</div>
+    <div
+      id="detailMissingCount"
+      class="employee-summary-value"
+    >
+      0
+    </div>
+  </div>
+
+</div>
 
         <h3 class="employee-history-title">출퇴근 이력</h3>
 
@@ -816,6 +826,7 @@
                 <th>날짜</th>
                 <th>출근시간</th>
                 <th>퇴근시간</th>
+                <th>근무시간</th>
                 <th>상태</th>
               </tr>
             </thead>
@@ -1361,6 +1372,23 @@ function renderEmployeeDetail(result) {
   document.getElementById("detailCheckOutCount").textContent =
     Number(summary.checkOutCount || 0).toLocaleString();
 
+  const avgMinutes =
+    Number(summary.averageWorkTime || 0);
+
+let avgText = "-";
+
+if(avgMinutes > 0){
+
+    const h = Math.floor(avgMinutes / 60);
+    const m = avgMinutes % 60;
+
+    avgText = h + "시간 " + m + "분";
+}
+
+document.getElementById(
+    "detailAverageWorkTime"
+).textContent = avgText;  
+
   document.getElementById("detailMissingCount").textContent =
     Math.max(
       0,
@@ -1375,7 +1403,7 @@ function renderEmployeeDetail(result) {
   if (!history.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="4">
+        <td colspan="5">
           출퇴근 이력이 없습니다.
         </td>
       </tr>
@@ -1396,11 +1424,12 @@ function renderEmployeeDetail(result) {
     }
 
     tr.innerHTML = `
-      <td>${escapeHtml(item.date || "")}</td>
-      <td>${escapeHtml(item.checkIn || "-")}</td>
-      <td>${escapeHtml(item.checkOut || "-")}</td>
-      <td>${escapeHtml(status)}</td>
-    `;
+  <td>${escapeHtml(item.date || "")}</td>
+  <td>${escapeHtml(item.checkIn || "-")}</td>
+  <td>${escapeHtml(item.checkOut || "-")}</td>
+  <td>${escapeHtml(item.workTime || "-")}</td>
+  <td>${escapeHtml(status)}</td>
+`;  
 
     tbody.appendChild(tr);
   });
