@@ -297,6 +297,171 @@
       color: #b3261e;
     }
 
+    .employee-link {
+  border: 0;
+  background: transparent;
+  color: #5b2c16;
+  font-size: 14px;
+  font-weight: 900;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.employee-link:hover {
+  color: #b3261e;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.48);
+}
+
+.employee-modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.employee-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.employee-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #5b2c16;
+}
+
+.modal-close-button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: #eee;
+  color: #333;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.employee-modal-body {
+  padding: 24px;
+}
+
+.employee-profile {
+  padding: 18px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: #f8f4ed;
+  text-align: center;
+}
+
+.employee-profile-name {
+  margin-bottom: 6px;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.employee-profile-phone {
+  font-size: 17px;
+  color: #666;
+}
+
+.employee-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.employee-summary-card {
+  padding: 18px 12px;
+  border: 1px solid #eadfce;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+}
+
+.employee-summary-label {
+  margin-bottom: 8px;
+  color: #777;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.employee-summary-value {
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.employee-history-title {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+
+.employee-history-wrap {
+  overflow-x: auto;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+}
+
+.employee-history-table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+}
+
+.employee-history-table th,
+.employee-history-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.employee-history-table th {
+  background: #f3eadf;
+}
+
+.modal-loading,
+.modal-error {
+  padding: 40px 20px;
+  text-align: center;
+  color: #777;
+}
+
+.modal-error {
+  color: #b3261e;
+}
+
+@media (max-width: 560px) {
+  .employee-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-modal-body {
+    padding: 18px;
+  }
+}
+
     .hidden {
       display: none !important;
     }
@@ -562,6 +727,109 @@
 
 </div>
 
+<div
+  id="employeeModalOverlay"
+  class="modal-overlay hidden"
+  onclick="handleEmployeeModalBackground(event)"
+>
+  <div
+    class="employee-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="employeeModalTitle"
+  >
+    <div class="employee-modal-header">
+      <h2 id="employeeModalTitle">직원 상세조회</h2>
+
+      <button
+        type="button"
+        class="modal-close-button"
+        onclick="closeEmployeeModal()"
+        aria-label="닫기"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="employee-modal-body">
+
+      <div id="employeeModalLoading" class="modal-loading hidden">
+        직원 출퇴근 내역을 조회하고 있습니다.
+      </div>
+
+      <div id="employeeModalError" class="modal-error hidden"></div>
+
+      <div id="employeeModalContent" class="hidden">
+
+        <div class="employee-profile">
+          <div
+            id="detailEmployeeName"
+            class="employee-profile-name"
+          ></div>
+
+          <div
+            id="detailEmployeePhone"
+            class="employee-profile-phone"
+          ></div>
+        </div>
+
+        <div class="employee-summary-grid">
+
+          <div class="employee-summary-card">
+            <div class="employee-summary-label">출근 횟수</div>
+            <div
+              id="detailCheckInCount"
+              class="employee-summary-value"
+            >
+              0
+            </div>
+          </div>
+
+          <div class="employee-summary-card">
+            <div class="employee-summary-label">퇴근 횟수</div>
+            <div
+              id="detailCheckOutCount"
+              class="employee-summary-value"
+            >
+              0
+            </div>
+          </div>
+
+          <div class="employee-summary-card">
+            <div class="employee-summary-label">퇴근 미처리</div>
+            <div
+              id="detailMissingCount"
+              class="employee-summary-value"
+            >
+              0
+            </div>
+          </div>
+
+        </div>
+
+        <h3 class="employee-history-title">출퇴근 이력</h3>
+
+        <div class="employee-history-wrap">
+          <table class="employee-history-table">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>출근시간</th>
+                <th>퇴근시간</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+
+            <tbody id="employeeHistoryBody"></tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
 <script>
   const API_URL =
@@ -735,7 +1003,18 @@
 
       tr.innerHTML = `
         <td>${escapeHtml(row.date)}</td>
-        <td><strong>${escapeHtml(row.name)}</strong></td>
+        <td>
+  <button
+    type="button"
+    class="employee-link"
+    onclick='openEmployeeDetail(
+      ${JSON.stringify(String(row.name || ""))},
+      ${JSON.stringify(String(row.phone || ""))}
+    )'
+  >
+    ${escapeHtml(row.name)}
+  </button>
+</td>
         <td>${escapeHtml(formatPhone(row.phone))}</td>
         <td>${escapeHtml(row.checkIn || "-")}</td>
         <td>${escapeHtml(row.checkOut || "-")}</td>
@@ -1012,6 +1291,143 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+  function openEmployeeDetail(name, phone) {
+  const overlay =
+    document.getElementById("employeeModalOverlay");
+
+  const loading =
+    document.getElementById("employeeModalLoading");
+
+  const errorBox =
+    document.getElementById("employeeModalError");
+
+  const content =
+    document.getElementById("employeeModalContent");
+
+  overlay.classList.remove("hidden");
+  loading.classList.remove("hidden");
+  errorBox.classList.add("hidden");
+  content.classList.add("hidden");
+
+  document.body.style.overflow = "hidden";
+
+  apiRequest({
+    action: "getEmployeeAttendanceDetail",
+    name: name,
+    phone: phone
+  })
+  .then(function(result) {
+    loading.classList.add("hidden");
+
+    if (!result || !result.success) {
+      errorBox.textContent =
+        result && result.message
+          ? result.message
+          : "직원 상세정보 조회에 실패했습니다.";
+
+      errorBox.classList.remove("hidden");
+      return;
+    }
+
+    renderEmployeeDetail(result);
+    content.classList.remove("hidden");
+  })
+  .catch(function(error) {
+    console.error(error);
+
+    loading.classList.add("hidden");
+    errorBox.textContent =
+      "직원 상세정보 조회 중 오류가 발생했습니다.";
+
+    errorBox.classList.remove("hidden");
+  });
+}
+
+
+function renderEmployeeDetail(result) {
+  const employee = result.employee || {};
+  const summary = result.summary || {};
+  const history = result.history || [];
+
+  document.getElementById("detailEmployeeName").textContent =
+    employee.name || "";
+
+  document.getElementById("detailEmployeePhone").textContent =
+    formatPhone(employee.phone || "");
+
+  document.getElementById("detailCheckInCount").textContent =
+    Number(summary.checkInCount || 0).toLocaleString();
+
+  document.getElementById("detailCheckOutCount").textContent =
+    Number(summary.checkOutCount || 0).toLocaleString();
+
+  document.getElementById("detailMissingCount").textContent =
+    Math.max(
+      0,
+      Number(summary.missingCheckout || 0)
+    ).toLocaleString();
+
+  const tbody =
+    document.getElementById("employeeHistoryBody");
+
+  tbody.innerHTML = "";
+
+  if (!history.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4">
+          출퇴근 이력이 없습니다.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  history.forEach(function(item) {
+    const tr = document.createElement("tr");
+
+    let status = "출근 기록 없음";
+
+    if (item.checkIn && item.checkOut) {
+      status = "퇴근 완료";
+    } else if (item.checkIn) {
+      status = "퇴근 미처리";
+    }
+
+    tr.innerHTML = `
+      <td>${escapeHtml(item.date || "")}</td>
+      <td>${escapeHtml(item.checkIn || "-")}</td>
+      <td>${escapeHtml(item.checkOut || "-")}</td>
+      <td>${escapeHtml(status)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+
+function closeEmployeeModal() {
+  document
+    .getElementById("employeeModalOverlay")
+    .classList.add("hidden");
+
+  document.body.style.overflow = "";
+}
+
+
+function handleEmployeeModalBackground(event) {
+  if (event.target.id === "employeeModalOverlay") {
+    closeEmployeeModal();
+  }
+}
+
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") {
+    closeEmployeeModal();
+  }
+});
 </script>
 
 </body>
