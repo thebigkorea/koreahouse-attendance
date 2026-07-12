@@ -1446,10 +1446,12 @@
   document.body.style.overflow = "hidden";
 
   apiRequest({
-    action: "getEmployeeAttendanceDetail",
-    name: name,
-    phone: phone
-  })
+  action: "getEmployeeAttendanceDetail",
+  name: name,
+  phone: phone,
+  startDate: document.getElementById("startDate").value,
+  endDate: document.getElementById("endDate").value
+})
   .then(function(result) {
     loading.classList.add("hidden");
 
