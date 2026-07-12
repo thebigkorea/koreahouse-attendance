@@ -162,6 +162,41 @@
       background: #f4eee6;
     }
 
+    .quick-button:hover,
+.tool-button:hover {
+  background: #f4eee6;
+}
+
+/* 여기부터 추가 */
+
+.status-filter{
+    display:flex;
+    gap:10px;
+    margin:18px 0;
+}
+
+.filter-btn{
+    padding:10px 18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#e7e7e7;
+    font-weight:700;
+}
+
+.filter-btn.active{
+    background:#6b3f25;
+    color:#fff;
+}
+
+/* 여기까지 추가 */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 16px;
+}
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(150px, 1fr));
@@ -639,6 +674,40 @@
         이번 달
       </button>
     </div>
+
+    <div class="status-filter">
+  <button
+    type="button"
+    class="filter-btn active"
+    onclick="filterStatus('전체', this)"
+  >
+    전체
+  </button>
+
+  <button
+    type="button"
+    class="filter-btn"
+    onclick="filterStatus('근무중', this)"
+  >
+    근무중
+  </button>
+
+  <button
+    type="button"
+    class="filter-btn"
+    onclick="filterStatus('퇴근 완료', this)"
+  >
+    퇴근완료
+  </button>
+
+  <button
+    type="button"
+    class="filter-btn"
+    onclick="filterStatus('퇴근 미처리', this)"
+  >
+    퇴근미처리
+  </button>
+</div>
   </section>
 
 
@@ -1009,7 +1078,25 @@
       return;
     }
 
-    rows.forEach(function(row) {
+    const list = rows.filter(function(row){
+
+    if(currentStatusFilter==="전체")
+        return true;
+
+    if(currentStatusFilter==="근무중")
+        return row.status==="근무중";
+
+    if(currentStatusFilter==="퇴근 완료")
+        return row.status==="퇴근 완료";
+
+    if(currentStatusFilter==="퇴근 미처리")
+        return row.memo==="퇴근 미처리";
+
+    return true;
+
+});
+
+    list.forEach(function(row) {
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
@@ -1458,6 +1545,26 @@ document.addEventListener("keydown", function(event) {
     closeEmployeeModal();
   }
 });
+
+let currentStatusFilter = "전체";
+
+function filterStatus(status, button){
+
+    currentStatusFilter = status;
+
+    document
+        .querySelectorAll(".filter-btn")
+        .forEach(function(btn){
+
+            btn.classList.remove("active");
+
+        });
+
+    button.classList.add("active");
+
+    renderTable(attendanceRows);
+
+}
 </script>
 
 </body>
