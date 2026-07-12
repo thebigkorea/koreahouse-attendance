@@ -483,6 +483,29 @@
   color: #777;
 }
 
+.employee-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.kakao-copy-button {
+  min-width: 150px;
+  height: 48px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 12px;
+  background: #fee500;
+  color: #191919;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.kakao-copy-button:hover {
+  filter: brightness(0.97);
+}
+
 .modal-error {
   color: #b3261e;
 }
@@ -904,6 +927,16 @@
           </table>
         </div>
 
+        <div class="employee-modal-actions">
+  <button
+    type="button"
+    class="kakao-copy-button"
+    onclick="copyEmployeeAttendanceForKakao()"
+  >
+    카톡용 복사
+  </button>
+</div>
+
       </div>
 
     </div>
@@ -916,6 +949,8 @@
     "https://script.google.com/macros/s/AKfycbz6rYVTUixqPOhHhethQcRI4ziwNukl8EcZx9nVvFLw0rV5o4kLD_BExlONS7WPGE54sQ/exec";
 
   let attendanceRows = [];
+
+  let currentEmployeeDetail = null;
 
 
   window.addEventListener("load", function() {
@@ -1428,6 +1463,7 @@
       return;
     }
 
+    currentEmployeeDetail = result;
     renderEmployeeDetail(result);
     content.classList.remove("hidden");
   })
@@ -1523,6 +1559,156 @@ document.getElementById(
   });
 }
 
+function copyEmployeeAttendanceForKakao() {
+  if (!currentEmployeeDetail) {
+    alert("직원 상세정보를 먼저 조회해주세요.");
+    return;
+  }
+
+  const employee = currentEmployeeDetail.employee || {};
+  const summary = currentEmployeeDetail.summary || {};
+  const history = currentEmployeeDetail.history || [];
+
+  const startDate =
+    document.getElementById("startDate").value || "";
+
+  const endDate =
+    document.getElementById("endDate").value || "";
+
+  const avgMinutes =
+    Number(summary.averageWorkTime || 0);
+
+  let averageWorkTime = "-";
+
+  if (avgMinutes > 0) {
+    const hours = Math.floor(avgMinutes / 60);
+    const minutes = avgMinutes % 60;
+
+    averageWorkTime =
+      hours + "시간 " + minutes + "분";
+  }
+
+  const lines = [];
+
+  lines.push("[한국의집 출퇴근 내역 안내]");
+  lines.push("");
+  lines.push((employee.name || "직원") + " 님의 출퇴근 내역입니다.");
+  lines.push("");
+
+  if (startDate && endDate) {
+    lines.push(
+      "조회기간: " +
+      startDate +
+      (startDate !== endDate ? " ~ " + endDate : "")
+    );
+    lines.push("");
+  }
+
+  lines.push(
+    "출근 횟수: " +
+    Number(summary.checkInCount || 0).toLocaleString() +
+    "회"
+  );
+
+  lines.push(
+    "퇴근 횟수: " +
+    Number(summary.checkOutCount || 0).toLocaleString() +
+    "회"
+  );
+
+  lines.push(
+    "퇴근 미처리: " +
+    Math.max(
+      0,
+      Number(summary.missingCheckout || 0)
+    ).toLocaleString() +
+    "회"
+  );
+
+  lines.push("평균 근무시간: " + averageWorkTime);
+  lines.push("");
+  lines.push("[상세 내역]");
+
+  history.forEach(function(item) {
+    let status = "출근 기록 없음";
+
+    if (item.checkIn && item.checkOut) {
+      status = "퇴근 완료";
+    } else if (item.checkIn) {
+      status = "퇴근 미처리";
+    }
+
+    lines.push("");
+    lines.push(item.date || "-");
+
+    lines.push(
+      "출근 " + (item.checkIn || "-") +
+      " / 퇴근 " + (item.checkOut || "-")
+    );
+
+    if (item.workTime) {
+      lines.push("근무시간 " + item.workTime);
+    }
+
+    lines.push("상태 " + status);
+  });
+
+  lines.push("");
+  lines.push(
+    "기록이 실제 근무내역과 다른 경우 관리자에게 말씀해 주세요."
+  );
+
+  const text = lines.join("\n");
+
+  copyTextToClipboard(
+    text,
+    (employee.name || "직원") +
+      " 직원의 출퇴근 내역이 복사되었습니다."
+  );
+}
+
+function copyTextToClipboard(text, successMessage) {
+  if (
+    navigator.clipboard &&
+    window.isSecureContext
+  ) {
+    navigator.clipboard
+      .writeText(text)
+      .then(function() {
+        alert(successMessage);
+      })
+      .catch(function() {
+        fallbackCopyText(text, successMessage);
+      });
+
+    return;
+  }
+
+  fallbackCopyText(text, successMessage);
+}
+
+
+function fallbackCopyText(text, successMessage) {
+  const textarea =
+    document.createElement("textarea");
+
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  try {
+    document.execCommand("copy");
+    alert(successMessage);
+  } catch (error) {
+    alert("복사에 실패했습니다.");
+  }
+
+  textarea.remove();
+}
 
 function closeEmployeeModal() {
   document
@@ -1530,6 +1716,7 @@ function closeEmployeeModal() {
     .classList.add("hidden");
 
   document.body.style.overflow = "";
+  currentEmployeeDetail = null;
 }
 
 
