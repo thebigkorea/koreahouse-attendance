@@ -205,8 +205,8 @@
     .employee-box{padding:12px 14px;margin-bottom:12px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
     .employee-name{font-size:19px;margin:0;}
     .employee-phone{font-size:15px;}
-    .attendance-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    .attendance-actions button{margin-top:0;height:64px;border-radius:17px;font-size:22px;}
+    .attendance-actions{display:flex;flex-direction:column;gap:10px;}
+    .attendance-actions button{margin-top:0;height:64px;border-radius:17px;font-size:22px;width:100%;}
     .btn-reset{height:auto!important;margin:12px 0 0!important;padding:8px!important;background:transparent!important;box-shadow:none!important;font-size:13px!important;color:#777!important;text-decoration:underline;text-underline-offset:3px;}
     .status{margin-top:10px;padding:12px 13px;border-radius:14px;font-size:14px;min-height:44px;font-weight:700;}
     .status.status-before{background:#f4f4f4;color:#555;}
@@ -219,7 +219,7 @@
     .desc{font-size:14px;margin-bottom:18px;}
     @media(max-width:380px){
       .card{padding:20px 16px 18px}
-      .attendance-actions button{height:60px;font-size:20px}
+      .attendance-actions button{height:60px;font-size:20px;width:100%;}
       .employee-box{gap:7px}
     }
 
