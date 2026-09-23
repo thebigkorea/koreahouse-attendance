@@ -190,106 +190,37 @@
     }
 
 
-    /* ===== 더큰코리아 출퇴근 앱 스타일로 정리 ===== */
-    .wrap{
-      max-width:430px;
-      padding:20px 16px;
-    }
-    .card{
-      border-radius:26px;
-      padding:30px 24px 24px;
-      box-shadow:0 12px 35px rgba(63,48,35,.10);
-    }
-    .logo{
-      font-size:30px;
-      margin-bottom:5px;
-    }
-    .store{
-      font-size:15px;
-      margin-bottom:24px;
-    }
-    .title{
-      font-size:28px;
-      margin-bottom:16px;
-    }
-    .desc{
-      font-size:15px;
-      line-height:1.55;
-      margin-bottom:22px;
-    }
-    label{
-      font-size:15px;
-      margin-bottom:7px;
-    }
-    input{
-      height:58px;
-      border-radius:15px;
-      padding:0 16px;
-      font-size:19px;
-      font-weight:700;
-      letter-spacing:0 !important;
-      margin-bottom:16px;
-      background:#fff;
-    }
-    #phoneInput{
-      letter-spacing:0 !important;
-      font-variant-numeric:tabular-nums;
-    }
-    button{
-      height:62px;
-      border-radius:17px;
-      font-size:22px;
-      margin-top:12px;
-      box-shadow:0 6px 0 rgba(0,0,0,.18);
-    }
-    .btn-reset{
-      height:50px;
-      font-size:15px;
-      margin-top:12px;
-    }
-    .employee-box{
-      padding:18px;
-      border-radius:17px;
-      margin-bottom:16px;
-    }
-    .employee-name{
-      font-size:25px;
-      margin-bottom:4px;
-    }
-    .employee-phone{
-      font-size:18px;
-    }
-    .status{
-      margin-top:16px;
-      padding:14px;
-      border-radius:15px;
-      font-size:15px;
-      min-height:50px;
-    }
-    .attendance-greeting{
-      margin:-4px 0 14px;
-    }
-    .attendance-greeting strong{
-      font-size:15px;
-    }
-    .attendance-greeting span{
-      font-size:12px;
-    }
-    .daily-quote{
-      margin:0 0 16px;
-      padding:13px 14px;
-      border-radius:16px;
-    }
-    .daily-quote-text{
-      font-size:13px;
-    }
-    @media(max-width:480px){
-      .wrap{padding:14px 12px;align-items:flex-start;}
-      .card{margin-top:10px;padding:24px 18px 20px;}
-      .logo{font-size:28px;}
-      .title{font-size:26px;}
-      input{height:56px;font-size:18px;}
-      button{height:60px;font-size:21px;}
+    /* ===== 한국의집 출퇴근 - 컴팩트 앱형 최종 UI ===== */
+    .wrap{max-width:420px;padding:12px 14px;align-items:flex-start;}
+    .card{margin-top:10px;padding:24px 20px 20px;border-radius:25px;box-shadow:0 10px 30px rgba(55,42,30,.10);}
+    .logo{font-size:27px;margin-bottom:3px;}
+    .store{font-size:14px;margin-bottom:18px;}
+    .title{font-size:26px;margin-bottom:10px;}
+    .attendance-greeting{margin:0 0 12px;}
+    .attendance-greeting strong{font-size:14px;margin-bottom:3px;}
+    .attendance-greeting span{font-size:12px;}
+    .daily-quote{margin:0 0 12px;padding:11px 13px;border-radius:15px;}
+    .daily-quote-label{font-size:10px;margin-bottom:4px;}
+    .daily-quote-text{font-size:13px;line-height:1.45;}
+    .employee-box{padding:12px 14px;margin-bottom:12px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+    .employee-name{font-size:19px;margin:0;}
+    .employee-phone{font-size:15px;}
+    .attendance-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .attendance-actions button{margin-top:0;height:64px;border-radius:17px;font-size:22px;}
+    .btn-reset{height:auto!important;margin:12px 0 0!important;padding:8px!important;background:transparent!important;box-shadow:none!important;font-size:13px!important;color:#777!important;text-decoration:underline;text-underline-offset:3px;}
+    .status{margin-top:10px;padding:12px 13px;border-radius:14px;font-size:14px;min-height:44px;font-weight:700;}
+    .status.status-before{background:#f4f4f4;color:#555;}
+    .status.status-in{background:#edf7ef;color:#26733d;}
+    .status.status-done{background:#eef3f8;color:#365b78;}
+    label{font-size:14px;margin-bottom:6px;}
+    input{height:54px;font-size:18px;letter-spacing:0!important;margin-bottom:14px;border-radius:14px;}
+    #phoneInput{letter-spacing:0!important;font-variant-numeric:tabular-nums;}
+    .btn-register{height:58px;font-size:20px;border-radius:16px;}
+    .desc{font-size:14px;margin-bottom:18px;}
+    @media(max-width:380px){
+      .card{padding:20px 16px 18px}
+      .attendance-actions button{height:60px;font-size:20px}
+      .employee-box{gap:7px}
     }
 
   </style>
@@ -344,10 +275,12 @@
           <div id="employeePhone" class="employee-phone"></div>
         </div>
 
-        <button id="checkInBtn" class="btn-in" onclick="submitAttendance('출근')">출근</button>
-        <button id="checkOutBtn" class="btn-out" onclick="submitAttendance('퇴근')">퇴근</button>
+        <div class="attendance-actions">
+          <button id="checkInBtn" class="btn-in" onclick="submitAttendance('출근')">출근</button>
+          <button id="checkOutBtn" class="btn-out" onclick="submitAttendance('퇴근')">퇴근</button>
+        </div>
 
-        <button class="btn-reset" onclick="resetEmployee()">직원 정보 다시 등록</button>
+        <button class="btn-reset" onclick="resetEmployee()">직원정보 변경</button>
 
         <div id="attendanceStatus" class="status">
           위치 권한을 허용해야 출퇴근이 가능합니다.
@@ -757,7 +690,6 @@
       if (digits.length <= 7) return digits.replace(/(\d{3})(\d+)/, "$1-$2");
       return digits.replace(/(\d{3})(\d{4})(\d+)/, "$1-$2-$3");
     }
-
     function bindPhoneInput() {
       const input = document.getElementById("phoneInput");
       if (!input) return;
@@ -1035,7 +967,16 @@
     }
 
     function showAttendanceStatus(message) {
-      document.getElementById("attendanceStatus").innerText = message;
+      const box = document.getElementById("attendanceStatus");
+      box.innerText = message;
+      box.classList.remove("status-before", "status-in", "status-done");
+      if (message.includes("모두 처리") || message.includes("퇴근 처리")) {
+        box.classList.add("status-done");
+      } else if (message.includes("출근 처리")) {
+        box.classList.add("status-in");
+      } else {
+        box.classList.add("status-before");
+      }
     }
 
     function normalizePhone(phone) {
