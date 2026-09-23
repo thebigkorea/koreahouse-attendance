@@ -223,6 +223,18 @@
       .employee-box{gap:7px}
     }
 
+
+    .work-time-box{
+      display:grid;grid-template-columns:1fr 1fr;gap:8px;
+      margin:0 0 12px;
+    }
+    .work-time-box>div{
+      background:#f7f5f1;border:1px solid #ece4d8;border-radius:13px;
+      padding:9px 12px;display:flex;align-items:center;justify-content:space-between;
+    }
+    .work-time-box span{font-size:12px;font-weight:800;color:#777;}
+    .work-time-box strong{font-size:16px;font-weight:900;color:#333;}
+
   </style>
 </head>
 
@@ -273,6 +285,11 @@
         <div class="employee-box">
           <div id="employeeName" class="employee-name"></div>
           <div id="employeePhone" class="employee-phone"></div>
+        </div>
+
+        <div class="work-time-box">
+          <div><span>출근</span><strong id="checkInTime">--:--</strong></div>
+          <div><span>퇴근</span><strong id="checkOutTime">--:--</strong></div>
         </div>
 
         <div class="attendance-actions">
@@ -712,7 +729,7 @@
       showDailyQuote();
       showLoadingScreen();
 
-      setTimeout(function () {
+      (function () {
         const savedToken = localStorage.getItem("hk_token");
 
         if (savedToken) {
@@ -740,7 +757,7 @@
         } else {
           showRegisterScreen();
         }
-      }, 800);
+      })();
     };
 
     function registerEmployee() {
@@ -783,6 +800,48 @@
       });
     }
 
+
+    function nowHHMM() {
+      return new Date().toLocaleTimeString("ko-KR", {
+        hour:"2-digit", minute:"2-digit", hour12:false
+      });
+    }
+
+    function setWorkTimes(checkIn, checkOut) {
+      document.getElementById("checkInTime").textContent = checkIn || "--:--";
+      document.getElementById("checkOutTime").textContent = checkOut || "--:--";
+    }
+
+    function cacheTodayTimes(checkIn, checkOut) {
+      const key = new Date().toLocaleDateString("sv-SE");
+      localStorage.setItem("hk_attendance_date", key);
+      if (checkIn) localStorage.setItem("hk_checkin_time", checkIn);
+      if (checkOut) localStorage.setItem("hk_checkout_time", checkOut);
+    }
+
+    function restoreTodayTimes() {
+      const key = new Date().toLocaleDateString("sv-SE");
+      if (localStorage.getItem("hk_attendance_date") !== key) {
+        localStorage.removeItem("hk_checkin_time");
+        localStorage.removeItem("hk_checkout_time");
+        localStorage.setItem("hk_attendance_date", key);
+      }
+      setWorkTimes(
+        localStorage.getItem("hk_checkin_time") || "",
+        localStorage.getItem("hk_checkout_time") || ""
+      );
+    }
+
+    function extractTime(result, type) {
+      const candidates = type === "출근"
+        ? [result.checkInTime, result.checkinTime, result.inTime, result.time]
+        : [result.checkOutTime, result.checkoutTime, result.outTime, result.time];
+      const raw = candidates.find(Boolean);
+      if (!raw) return "";
+      const m = String(raw).match(/(\d{1,2}):(\d{2})/);
+      return m ? String(m[1]).padStart(2,"0") + ":" + m[2] : "";
+    }
+
     function submitAttendance(type) {
       if (!currentEmployee.name || !currentEmployee.phone || !currentEmployee.token) {
         showAttendanceStatus("직원 정보가 없습니다. 다시 등록해주세요.");
@@ -791,25 +850,31 @@
 
       const checkInBtn = document.getElementById("checkInBtn");
       const checkOutBtn = document.getElementById("checkOutBtn");
+      const instantTime = nowHHMM();
 
+      // 직원에게는 즉시 반응
       if (type === "출근") {
-        checkInBtn.innerText = "출근 처리중...";
+        checkInBtn.innerText = "출근 저장중...";
         checkInBtn.disabled = true;
-      }
-
-      if (type === "퇴근") {
-        checkOutBtn.innerText = "퇴근 처리중...";
+        document.getElementById("checkInTime").textContent = instantTime;
+        cacheTodayTimes(instantTime, "");
+        showAttendanceStatus("출근 " + instantTime + " · 저장 중...");
+      } else {
+        checkOutBtn.innerText = "퇴근 저장중...";
         checkOutBtn.disabled = true;
+        document.getElementById("checkOutTime").textContent = instantTime;
+        cacheTodayTimes(localStorage.getItem("hk_checkin_time") || "", instantTime);
+        showAttendanceStatus("퇴근 " + instantTime + " · 저장 중...");
       }
-
-      showAttendanceStatus("위치 확인중...");
 
       if (!navigator.geolocation) {
         resetButtonText();
         showAttendanceStatus("이 기기에서는 위치 기능을 사용할 수 없습니다.");
+        loadTodayStatus();
         return;
       }
 
+      // 고정밀 GPS를 매번 새로 잡느라 오래 걸리지 않도록 최근 위치 허용
       navigator.geolocation.getCurrentPosition(
         function(position) {
           apiRequest({
@@ -822,20 +887,27 @@
             lng: position.coords.longitude
           }).then(function(result) {
             resetButtonText();
-            showAttendanceStatus(result.message);
 
             if (result.success) {
+              const serverTime = extractTime(result, type) || instantTime;
               if (type === "출근") {
-                updateButtons(true, false);
+                document.getElementById("checkInTime").textContent = serverTime;
+                cacheTodayTimes(serverTime, localStorage.getItem("hk_checkout_time") || "");
+                updateButtons(true, false, true);
+                showAttendanceStatus("✓ " + serverTime + " 출근 완료");
               } else {
-                updateButtons(true, true);
+                document.getElementById("checkOutTime").textContent = serverTime;
+                cacheTodayTimes(localStorage.getItem("hk_checkin_time") || "", serverTime);
+                updateButtons(true, true, true);
+                showAttendanceStatus("✓ " + serverTime + " 퇴근 완료");
               }
             } else {
+              showAttendanceStatus(result.message || "처리하지 못했습니다.");
               loadTodayStatus();
             }
           }).catch(function() {
             resetButtonText();
-            showAttendanceStatus("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            showAttendanceStatus("저장 확인 중 오류가 발생했습니다. 다시 확인합니다.");
             loadTodayStatus();
           });
         },
@@ -845,9 +917,9 @@
           loadTodayStatus();
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 60000
         }
       );
     }
@@ -858,13 +930,36 @@
     }
 
     function loadTodayStatus() {
+      restoreTodayTimes();
+
       apiRequest({
         action: "getTodayAttendanceStatus",
         phone: currentEmployee.phone
       }).then(function(result) {
-        updateButtons(result.hasCheckIn, result.hasCheckOut);
+        const inTime = extractTime(result, "출근") || localStorage.getItem("hk_checkin_time") || "";
+        const outTime = extractTime(result, "퇴근") || localStorage.getItem("hk_checkout_time") || "";
+        setWorkTimes(inTime, outTime);
+        if (inTime || outTime) cacheTodayTimes(inTime, outTime);
+        updateButtons(result.hasCheckIn, result.hasCheckOut, true);
+
+        if (!result.hasCheckIn) {
+          showAttendanceStatus("아직 출근 전입니다.");
+        } else if (result.hasCheckIn && !result.hasCheckOut) {
+          showAttendanceStatus(inTime ? "✓ " + inTime + " 출근 완료" : "✓ 출근 완료");
+        } else {
+          showAttendanceStatus(
+            outTime ? "✓ " + outTime + " 퇴근 완료" : "✓ 오늘 출퇴근 완료"
+          );
+        }
       }).catch(function() {
-        showAttendanceStatus("출퇴근 상태 확인 중 오류가 발생했습니다.");
+        const inTime = localStorage.getItem("hk_checkin_time") || "";
+        const outTime = localStorage.getItem("hk_checkout_time") || "";
+        if (inTime || outTime) {
+          updateButtons(!!inTime, !!outTime, true);
+          showAttendanceStatus(outTime ? "✓ " + outTime + " 퇴근 완료" : "✓ " + inTime + " 출근 완료");
+        } else {
+          showAttendanceStatus("출퇴근 상태 확인 중 오류가 발생했습니다.");
+        }
       });
     }
 
@@ -881,7 +976,7 @@
       });
     }
 
-    function updateButtons(hasCheckIn, hasCheckOut) {
+    function updateButtons(hasCheckIn, hasCheckOut, silent) {
       const checkInBtn = document.getElementById("checkInBtn");
       const checkOutBtn = document.getElementById("checkOutBtn");
 
@@ -903,12 +998,14 @@
         checkOutBtn.classList.add("btn-disabled");
       }
 
-      if (!hasCheckIn) {
-        showAttendanceStatus("아직 출근 전입니다.");
-      } else if (hasCheckIn && !hasCheckOut) {
-        showAttendanceStatus("출근 처리되었습니다. 퇴근 버튼을 사용할 수 있습니다.");
-      } else {
-        showAttendanceStatus("오늘 출근과 퇴근이 모두 처리되었습니다.");
+      if (!silent) {
+        if (!hasCheckIn) {
+          showAttendanceStatus("아직 출근 전입니다.");
+        } else if (hasCheckIn && !hasCheckOut) {
+          showAttendanceStatus("출근 처리되었습니다. 퇴근 버튼을 사용할 수 있습니다.");
+        } else {
+          showAttendanceStatus("오늘 출근과 퇴근이 모두 처리되었습니다.");
+        }
       }
     }
 
@@ -958,6 +1055,7 @@
 
       document.getElementById("employeeName").innerText = currentEmployee.name;
       document.getElementById("employeePhone").innerText = formatPhone(currentEmployee.phone);
+      restoreTodayTimes();
     }
 
     function showRegisterStatus(message) {
