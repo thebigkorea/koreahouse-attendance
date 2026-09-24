@@ -38,6 +38,14 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
+    .company-logo {
+      display: block;
+      width: 190px;
+      max-width: 62%;
+      height: auto;
+      margin: 0 auto 14px;
+    }
+
     .logo {
       text-align: center;
       font-size: 34px;
@@ -242,6 +250,7 @@
   <div class="wrap">
     <div class="card">
 
+      <img class="company-logo" src="images/thebigkorea-logo.png" alt="더큰코리아">
       <div class="logo">한국의집</div>
       <div class="store">롯데월드몰 출퇴근 관리</div>
 
@@ -852,19 +861,18 @@
       const checkOutBtn = document.getElementById("checkOutBtn");
       const instantTime = nowHHMM();
 
-      // 직원에게는 즉시 반응
+      // 길채정과 동일하게 누르는 즉시 완료 상태로 반응
+      // 위치 확인과 서버 저장은 바로 이어서 백그라운드에서 처리
       if (type === "출근") {
-        checkInBtn.innerText = "출근 저장중...";
-        checkInBtn.disabled = true;
         document.getElementById("checkInTime").textContent = instantTime;
-        cacheTodayTimes(instantTime, "");
-        showAttendanceStatus("출근 " + instantTime + " · 저장 중...");
+        cacheTodayTimes(instantTime, localStorage.getItem("hk_checkout_time") || "");
+        updateButtons(true, false, true);
+        showAttendanceStatus("✓ " + instantTime + " 출근 완료");
       } else {
-        checkOutBtn.innerText = "퇴근 저장중...";
-        checkOutBtn.disabled = true;
         document.getElementById("checkOutTime").textContent = instantTime;
         cacheTodayTimes(localStorage.getItem("hk_checkin_time") || "", instantTime);
-        showAttendanceStatus("퇴근 " + instantTime + " · 저장 중...");
+        updateButtons(true, true, true);
+        showAttendanceStatus("✓ " + instantTime + " 퇴근 완료");
       }
 
       if (!navigator.geolocation) {
@@ -1068,9 +1076,9 @@
       const box = document.getElementById("attendanceStatus");
       box.innerText = message;
       box.classList.remove("status-before", "status-in", "status-done");
-      if (message.includes("모두 처리") || message.includes("퇴근 처리")) {
+      if (message.includes("모두 처리") || message.includes("퇴근 처리") || message.includes("퇴근 완료")) {
         box.classList.add("status-done");
-      } else if (message.includes("출근 처리")) {
+      } else if (message.includes("출근 처리") || message.includes("출근 완료")) {
         box.classList.add("status-in");
       } else {
         box.classList.add("status-before");
